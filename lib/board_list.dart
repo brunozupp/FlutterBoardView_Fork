@@ -11,8 +11,8 @@ class BoardList extends StatefulWidget {
   final List<Widget>? header;
   final Widget? footer;
   final List<BoardItem>? items;
-  final Color? backgroundColor;
-  final Color? headerBackgroundColor;
+  final Color backgroundColor;
+  final Color headerBackgroundColor;
   final BoardViewState? boardView;
   final OnDropList? onDropList;
   final OnTapList? onTapList;
@@ -24,8 +24,8 @@ class BoardList extends StatefulWidget {
     this.header,
     this.items,
     this.footer,
-    this.backgroundColor,
-    this.headerBackgroundColor,
+    this.backgroundColor = Colors.white,
+    this.headerBackgroundColor = Colors.white,
     this.boardView,
     this.draggable = true,
     this.index, this.onDropList, this.onTapList, this.onStartDragList,
@@ -78,12 +78,10 @@ class BoardListState extends State<BoardList> with AutomaticKeepAliveClientMixin
 
   @override
   Widget build(BuildContext context) {
+
     List<Widget> listWidgets = [];
     if (widget.header != null) {
-      Color? headerBackgroundColor = Color.fromARGB(255, 255, 255, 255);
-      if (widget.headerBackgroundColor != null) {
-        headerBackgroundColor = widget.headerBackgroundColor;
-      }
+
       listWidgets.add(GestureDetector(
           onTap: (){
             if(widget.onTapList != null){
@@ -113,68 +111,71 @@ class BoardListState extends State<BoardList> with AutomaticKeepAliveClientMixin
                 mainAxisSize: MainAxisSize.max,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: widget.header!),
-          )));
-
+          ),
+        ),
+      );
     }
     if (widget.items != null) {
-      listWidgets.add(Container(
+      listWidgets.add(
+        Container(
           child: Flexible(
-              fit: FlexFit.loose,
-              child: new ListView.builder(
-                shrinkWrap: true,
-                physics: ClampingScrollPhysics(),
-                controller: boardListController,
-                itemCount: widget.items!.length,
-                itemBuilder: (ctx, index) {
-                  if (widget.items![index].boardList == null ||
-                      widget.items![index].index != index ||
-                      widget.items![index].boardList!.widget.index != widget.index ||
-                      widget.items![index].boardList != this) {
-                    widget.items![index] = new BoardItem(
-                      boardList: this,
-                      item: widget.items![index].item,
-                      draggable: widget.items![index].draggable,
-                      index: index,
-                      onDropItem: widget.items![index].onDropItem,
-                      onTapItem: widget.items![index].onTapItem,
-                      onDragItem: widget.items![index].onDragItem,
-                      onStartDragItem: widget.items![index].onStartDragItem,
-                    );
-                  }
-                  if (widget.boardView!.draggedItemIndex == index &&
-                      widget.boardView!.draggedListIndex == widget.index) {
-                    return Opacity(
-                      opacity: 0.0,
-                      child: widget.items![index],
-                    );
-                  } else {
-                    return widget.items![index];
-                  }
-                },
-              ))));
+            fit: FlexFit.loose,
+            child: new ListView.builder(
+              shrinkWrap: true,
+              physics: ClampingScrollPhysics(),
+              controller: boardListController,
+              itemCount: widget.items!.length,
+              itemBuilder: (ctx, index) {
+                if (widget.items![index].boardList == null ||
+                    widget.items![index].index != index ||
+                    widget.items![index].boardList!.widget.index !=
+                        widget.index ||
+                    widget.items![index].boardList != this) {
+                  widget.items![index] = new BoardItem(
+                    boardList: this,
+                    item: widget.items![index].item,
+                    draggable: widget.items![index].draggable,
+                    index: index,
+                    onDropItem: widget.items![index].onDropItem,
+                    onTapItem: widget.items![index].onTapItem,
+                    onDragItem: widget.items![index].onDragItem,
+                    onStartDragItem: widget.items![index].onStartDragItem,
+                  );
+                }
+                if (widget.boardView!.draggedItemIndex == index &&
+                    widget.boardView!.draggedListIndex == widget.index) {
+                  return Opacity(
+                    opacity: 0.0,
+                    child: widget.items![index],
+                  );
+                } else {
+                  return widget.items![index];
+                }
+              },
+            ),
+          ),
+        ),
+      );
     }
 
     if (widget.footer != null) {
       listWidgets.add(widget.footer!);
     }
 
-    Color? backgroundColor = Color.fromARGB(255, 255, 255, 255);
-
-    if (widget.backgroundColor != null) {
-      backgroundColor = widget.backgroundColor;
-    }
     if (widget.boardView!.listStates.length > widget.index!) {
       widget.boardView!.listStates.removeAt(widget.index!);
     }
+    
     widget.boardView!.listStates.insert(widget.index!, this);
 
     return Container(
-        margin: EdgeInsets.all(8),
-        decoration: BoxDecoration(color: backgroundColor),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: listWidgets as List<Widget>,
-        ));
+      margin: EdgeInsets.all(8),
+      decoration: BoxDecoration(color: widget.backgroundColor),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: listWidgets,
+      ),
+    );
   }
 }
